@@ -1,6 +1,29 @@
+"use client"
+import  { useEffect, useState, FormEvent} from "react"
+import { supabase } from "@/lib/supabase"
+import toast, { Toast} from "react-hot-toast";
+import Swal from "sweetalert2";
+import "sweetalert2/dist/sweetalert2.min.css"
 
+interface Student{
+  id?:string,
+  name:string,
+  email:string,
+  phone_number:string,
+  gender:string
+}
 
 export default function Home() {
+
+  const [students, setStudents] = useState<Student[]>([])
+  const [form, setForm] = useState<Student>({
+    name: "",
+    email: "",
+    phone_number: "",
+    gender: ""
+  })
+  const [editId, setEditId] = useState<string | null>(null)
+
   return (
     <>
       <div className="container my-5">
@@ -13,19 +36,37 @@ export default function Home() {
                   <form>
                     <div className="mb-3">
                       <label className="form-label">Name</label>
-                      <input type="text" className="form-control"/>
+                      <input type="text" value={ form.name } className="form-control" onChange={ (e) => setForm ({ 
+                        ...form,
+                        name: e.target.value
+                      })}/>
                     </div>
                     <div className="mb-3">
                       <label className="form-label">Email</label>
-                      <input type="email" className="form-control"/>
+                      <input type="email" value={ form.email } className="form-control" onChange={
+                        (e) => setForm({
+                          ...form,
+                          email: e.target.value
+                        }) 
+                      }/>
                     </div>
                     <div className="mb-3">
                       <label className="form-label">Phone Number</label>
-                      <input type="text" className="form-control"/>
+                      <input type="text" value={ form.phone_number} className="form-control" onChange={
+                        (e) => setForm({
+                          ...form,
+                          phone_number: e.target.value
+                        })
+                      }/>
                     </div>
                     <div className="mb-3">
                       <label className="form-label">Gender</label>
-                      <select className="form-select">
+                      <select className="form-select" value={ form.gender } onChange={
+                        (e) => setForm({
+                          ...form,
+                          gender: e.target.value
+                        })
+                      }>
                         <option value="male">Male</option>
                         <option value="female">Female</option>
                         <option value="other">Other</option>
