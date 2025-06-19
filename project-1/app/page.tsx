@@ -1,7 +1,7 @@
 "use client"
 import  { useEffect, useState, FormEvent} from "react"
 import { supabase } from "@/lib/supabase"
-import toast, { Toast} from "react-hot-toast";
+import toast, { Toaster } from "react-hot-toast";
 import Swal from "sweetalert2";
 import "sweetalert2/dist/sweetalert2.min.css"
 
@@ -24,16 +24,36 @@ export default function Home() {
   })
   const [editId, setEditId] = useState<string | null>(null)
 
+  async function handleFormSubmit(event: FormEvent<HTMLFormElement>){
+    event.preventDefault()    
+
+    console.log(form)
+
+    const {error, data} = await supabase.from<Student>("students").insert( [ form ] )
+
+    // console.log('Data:', data);
+    // console.log('Error:', error);
+
+    if (error) {
+
+      toast.error(`Fialed to create ${JSON.stringify(error)}`)
+    } else {
+
+      toast.success("students added successfully")
+    }
+  }
+ 
   return (
     <>
       <div className="container my-5">
+        <Toaster />
         <h3 className="mb-4">Student Management</h3>
         <div className="row">
             {/** Left Side form*/}
             <div className="col-md-4">
               <div className="card mb-4">
                 <div className="card-body">
-                  <form>
+                  <form onSubmit={ handleFormSubmit }>
                     <div className="mb-3">
                       <label className="form-label">Name</label>
                       <input type="text" value={ form.name } className="form-control" onChange={ (e) => setForm ({ 
@@ -95,7 +115,7 @@ export default function Home() {
                       <td>harshal</td>
                       <td>xys@gmail.com</td>
                       <td>9881944751</td>
-                      <td>gay</td>
+                      <td>male</td>
                       <td>
                         <button className="btn btn-warning btn-sm me-2">Edit</button>
                         <button className="btn btn-danger btn-sm me-2">Delete</button>
