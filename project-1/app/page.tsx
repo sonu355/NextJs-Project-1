@@ -31,22 +31,38 @@ export default function Home() {
   //form submission
   async function handleFormSubmit(event: FormEvent<HTMLFormElement>){
     event.preventDefault()
-
     console.log(form)
 
-    const {error} = await supabase.from<Student>("students").insert( [form] )
-
-    if (error) {
-      toast.error(`failed to create ${error.message}`)
+    if (editId) {
+      const {error} = await supabase.from<Student>("students").update( [form] ).eq("id", editId)
+      if (error) {
+        toast.error("failed to update student")
+      } else {
+        toast.success("student updated successfully")
+      }
     } else {
-      toast.success("students added successfully")
+      const {error} = await supabase.from<Student>("students").insert( [form] )
+      if (error) {
+        toast.error(`failed to create ${error.message}`)
+      } else {
+        toast.success("students added successfully")
+      }
+      setForm({
+        name: "",
+        email: "",
+        phone_number: "",
+        gender: "Male"
+      })
     }
-    setForm({
-      name: "",
-      email: "",
-      phone_number: "",
-      gender: "Male"
-    })
+    fetchStudents()
+  }
+
+  function handleStudentEdit(student: Student){
+    setForm(student)
+    if(student.id){
+      setEditId(student.id)
+    }
+    console.log("Edit Clicked")
   }
 
   async function fetchStudents(){
@@ -56,6 +72,28 @@ export default function Home() {
     } else {
       console.log(data)
       setStudents( data || [])
+    }
+  }
+
+  async function handleStudentDelete(id: string){
+    const result = await Swal.fire({
+      title: "Are you sure?",
+      text: "You won't be able to revert this!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Yes, delete it!"
+    })
+    if(result.isConfirmed){
+      const { error } = await supabase.from<Student>("students").delete().eq("id", id)
+
+      if (error) {
+        toast.error("failed to delete student")
+      } else {
+        toast.success("student deleted successfully")
+        fetchStudents()
+      }
     }
   }
  
@@ -127,16 +165,22 @@ export default function Home() {
                     </tr>
                   </thead>
                   <tbody>
-                    <tr>
-                      <td>harshal</td>
-                      <td>xys@gmail.com</td>
-                      <td>9881944751</td>
-                      <td>male</td>
-                      <td>
-                        <button className="btn btn-warning btn-sm me-2">Edit</button>
-                        <button className="btn btn-danger btn-sm me-2">Delete</button>
-                      </td>
-                    </tr>
+                    {
+                      students.map((singlestudent) => (
+                        <tr key={singlestudent.id}>
+                          <td>hars</td>
+                          <td>xys@gmail.com</td>
+                          <td>9881944751</td>
+                          <td>male</td>
+                          <td>
+                            <button className="btn btn-warning btn-sm me-2" onClick={() => handleStudentEdit(singlestudent)}>
+                            {editId ? "Update" : "Add"}</button>
+                            <button className="btn btn-danger btn-sm me-2" onClick={() => singlestudent.id && handleStudentDelete(singlestudent)}>
+                            Delete</button>
+                          </td>
+                        </tr>
+                      ))
+                    }
                   </tbody>
                 </table>
               </div>
