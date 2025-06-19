@@ -20,26 +20,42 @@ export default function Home() {
     name: "",
     email: "",
     phone_number: "",
-    gender: ""
+    gender: "Male"
   })
   const [editId, setEditId] = useState<string | null>(null)
 
+  useEffect(() => {
+    fetchStudents()
+  }, [])
+
+  //form submission
   async function handleFormSubmit(event: FormEvent<HTMLFormElement>){
-    event.preventDefault()    
+    event.preventDefault()
 
     console.log(form)
 
-    const {error, data} = await supabase.from<Student>("students").insert( [ form ] )
-
-    // console.log('Data:', data);
-    // console.log('Error:', error);
+    const {error} = await supabase.from<Student>("students").insert( [form] )
 
     if (error) {
-
-      toast.error(`Fialed to create ${JSON.stringify(error)}`)
+      toast.error(`failed to create ${error.message}`)
     } else {
-
       toast.success("students added successfully")
+    }
+    setForm({
+      name: "",
+      email: "",
+      phone_number: "",
+      gender: "Male"
+    })
+  }
+
+  async function fetchStudents(){
+    const { data, error } = await supabase.from("students").select("*")
+    if (error) {
+      toast.error(`Failed to read data ${error.message}`)
+    } else {
+      console.log(data)
+      setStudents( data || [])
     }
   }
  
