@@ -175,7 +175,7 @@ export default function Home() {
                           <td>
                             <button className="btn btn-warning btn-sm me-2" onClick={() => handleStudentEdit(singlestudent)}>
                             {editId ? "Update" : "Add"}</button>
-                            <button className="btn btn-danger btn-sm me-2" onClick={() => singlestudent.id && handleStudentDelete(singlestudent)}>
+                            <button className="btn btn-danger btn-sm me-2" onClick={() => singlestudent.id && handleStudentDelete(singlestudent.id)}>
                             Delete</button>
                           </td>
                         </tr>
